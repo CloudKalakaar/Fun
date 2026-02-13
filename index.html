@@ -3,124 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2026 Valentine Match Diagnostic</title>
+    <title>2026 Match Diagnostic</title>
     <style>
+        :root {
+            --primary: #ff4d6d;
+            --bg: #fff5f7;
+        }
+
+        * { box-sizing: border-box; }
+
         body {
-            margin: 0; padding: 0; height: 100vh;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            background-color: #fffafb;
+            margin: 0; padding: 0; 
+            height: 100dvh; /* Dynamic viewport height for mobile */
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            background-color: var(--bg);
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow: hidden;
             touch-action: none;
         }
-        .container { text-align: center; width: 90%; }
-        h1 { color: #ff4d6d; font-size: 1.8rem; font-weight: 800; }
-        #status-msg { color: #888; margin-top: 15px; height: 24px; font-size: 1rem; }
+
+        /* Live background movement */
+        .bg-animate {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .circle {
+            position: absolute;
+            background: rgba(255, 77, 109, 0.1);
+            border-radius: 50%;
+            animation: float 20s infinite alternate;
+        }
+
+        @keyframes float {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(50px, 100px) scale(1.2); }
+        }
+
+        .container { 
+            position: relative;
+            z-index: 10;
+            text-align: center; 
+            width: 85%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h1 { color: var(--primary); font-size: 1.8rem; font-weight: 800; margin-bottom: 5px; }
+        .tagline { color: #888; font-size: 0.9rem; margin-bottom: 30px; }
         
         #troll-button {
             padding: 18px 36px;
             font-size: 1.1rem;
             font-weight: 700;
-            background: #ff4d6d;
+            background: var(--primary);
             color: white;
             border: none;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(255, 77, 109, 0.4);
-            position: relative;
-            z-index: 100;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(255, 77, 109, 0.3);
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        #loading-screen {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: white;
-            z-index: 300;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .loader {
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid #ff4d6d;
-            border-radius: 50%;
-            width: 50px; height: 50px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* Wholesome Result Screen */
+        /* Result Screen: Perfectly Centered */
         #result-screen {
             display: none;
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #ffffff;
-            color: #333;
-            padding: 40px 25px;
-            box-sizing: border-box;
-            z-index: 400;
-            text-align: center;
-            animation: fadeIn 1s;
+            top: 0; left: 0; 
+            width: 100%; height: 100%;
+            background: white;
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Vertical Centering */
+            text-align: center; /* Horizontal Centering */
+            padding: 30px;
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .big-heart { font-size: 4rem; margin-bottom: 10px; }
-        .verdict-title { color: #ff4d6d; font-size: 2rem; font-weight: 900; margin-bottom: 10px; }
-        .compliment { font-size: 1.2rem; line-height: 1.6; color: #555; }
+        .verdict-box {
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .icon { font-size: 4rem; margin-bottom: 20px; }
+        .verdict-title { color: var(--primary); font-size: 2.2rem; font-weight: 900; line-height: 1; margin-bottom: 15px; }
+        .message { color: #444; font-size: 1.1rem; line-height: 1.6; margin-bottom: 25px; }
+        .status-badge { background: #fff0f3; color: var(--primary); padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
-    <div class="container" id="main-ui">
-        <h1>Valentine Compatibility Scan</h1>
-        <p>Targeting the highest potential match...</p>
-        <button id="troll-button">Find My Match</button>
-        <p id="status-msg">Click to begin scan...</p>
+    <div class="bg-animate">
+        <div class="circle" style="width: 200px; height: 200px; top: 10%; left: -50px;"></div>
+        <div class="circle" style="width: 150px; height: 150px; bottom: 10%; right: -30px; animation-delay: -5s;"></div>
     </div>
 
-    <div id="loading-screen">
-        <div class="loader"></div>
-        <h2 id="loading-text" style="color:#333;">Analyzing Your Vibe...</h2>
+    <div class="container" id="main-ui">
+        <h1>2026 Match Scan</h1>
+        <p class="tagline">Finding the one person who deserves you...</p>
+        <button id="troll-button">Start Scanning</button>
+        <p id="status-msg" style="margin-top:20px; color:#aaa; font-size:0.9rem;">Tap button to begin</p>
     </div>
 
     <div id="result-screen">
-        <div class="big-heart">✨👸✨</div>
-        <div class="verdict-title">SCAN COMPLETE: NO MATCH FOUND</div>
-        <div class="compliment">
-            <p>Our database checked 8 billion people, but we ran into a <b>Major Problem</b>...</p>
-            <p>You are officially <b>unmatchable</b> because honestly? No one else deserves a person like you yet. 💅</p>
-            <p style="color: #ff4d6d; font-weight: bold;">Verdict: Too Iconic for the Average Human.</p>
+        <div class="verdict-box">
+            <div class="icon">✨👸✨</div>
+            <div class="status-badge">DIAGNOSIS COMPLETE</div>
+            <div class="verdict-title">UNMATCHABLE</div>
+            <div class="message">
+                We checked 8 billion profiles, but we found a critical issue: <b>No one is on your level yet.</b> 
+                <br><br>
+                You aren't single; you're a <b>Limited Edition 1 of 1</b>. Why settle for a match when you're the prize?
+            </div>
+            <button onclick="location.reload()" style="background:#333; color:white; border:none; padding:12px 25px; border-radius:30px; font-weight:600;">Check Again in 2027</button>
         </div>
-        <br>
-        <p style="color: #888; font-size: 0.9rem;">Suggested Action: Go buy yourself some flowers and a chocolate. You're the prize here anyway.</p>
-        <button onclick="location.reload()" style="margin-top:30px; background:#ff4d6d; border:none; color:white; padding:12px 25px; font-weight:bold; border-radius:30px;">Try Again Next Era?</button>
     </div>
 
     <script>
         const btn = document.getElementById('troll-button');
         const status = document.getElementById('status-msg');
         const mainUI = document.getElementById('main-ui');
-        const loadingScreen = document.getElementById('loading-screen');
-        const loadingText = document.getElementById('loading-text');
         const resultScreen = document.getElementById('result-screen');
         
         let attempts = 0;
-        const teaseMessages = [
-            "Wait, almost got it!",
-            "Hang on, the server is blushing...",
-            "Searching for someone worthy...",
-            "Hold still!",
-            "You're too fast for them!",
-            "Still searching...",
-            "Checking the VIP list...",
-            "Okay, I found the truth!"
-        ];
+        const messages = ["Almost!", "Wait...", "So close!", "Searching...", "Found him! Oh wait..", "Checking the VIPs...", "Processing..."];
 
-        function jump() {
+        function jump(e) {
+            e.preventDefault();
             attempts++;
-            status.innerText = teaseMessages[Math.min(attempts, teaseMessages.length - 1)];
+            status.innerText = messages[Math.min(attempts, messages.length - 1)];
             
             const maxX = window.innerWidth - btn.clientWidth - 40;
             const maxY = window.innerHeight - btn.clientHeight - 40;
@@ -129,35 +151,22 @@
             btn.style.left = Math.max(20, Math.random() * maxX) + 'px';
             btn.style.top = Math.max(20, Math.random() * maxY) + 'px';
 
-            if (attempts > 8) {
-                btn.innerText = "VIEW RESULT ✨";
-                btn.style.background = "#ff4d6d";
-                btn.removeEventListener('touchstart', handleTouch);
-                btn.addEventListener('touchstart', startFakeLoading);
-                btn.addEventListener('click', startFakeLoading);
+            if (attempts > 7) {
+                btn.innerText = "REVEAL MATCH ✨";
+                btn.style.background = "#333";
+                btn.removeEventListener('touchstart', jump);
+                btn.addEventListener('touchstart', showResult);
+                btn.addEventListener('click', showResult);
             }
-        }
-
-        function handleTouch(e) {
-            e.preventDefault();
-            jump();
             if (navigator.vibrate) navigator.vibrate(30);
         }
 
-        btn.addEventListener('touchstart', handleTouch);
+        btn.addEventListener('touchstart', jump);
         btn.addEventListener('mouseover', jump);
 
-        function startFakeLoading() {
+        function showResult() {
             mainUI.style.display = 'none';
-            loadingScreen.style.display = 'flex';
-            
-            setTimeout(() => { loadingText.innerText = "Comparing qualities..."; }, 1500);
-            setTimeout(() => { loadingText.innerText = "Scanning for 'The One'..."; }, 3000);
-            setTimeout(() => { loadingText.innerText = "Realizing nobody is worthy..."; }, 4500);
-            setTimeout(() => { 
-                loadingScreen.style.display = 'none';
-                resultScreen.style.display = 'flex';
-            }, 6000);
+            resultScreen.style.display = 'flex';
         }
     </script>
 </body>
