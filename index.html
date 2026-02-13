@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2026 Valentine Diagnostic</title>
+    <style>
+        /* Modern, readable font stack */
+        body {
+            margin: 0; padding: 0; height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background-color: #fff5f7;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            touch-action: none;
+        }
+        .container { text-align: center; width: 90%; }
+        h1 { color: #ff4d6d; font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; }
+        b { color: #ff4d6d; }
+        #status-msg { color: #888; font-weight: 500; margin-top: 15px; height: 24px; font-size: 1rem; }
+        
+        #troll-button {
+            padding: 18px 36px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            background: #ff4d6d;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(255, 77, 109, 0.4);
+            position: relative;
+            z-index: 100;
+            transition: transform 0.1s ease;
+        }
+
+        /* Loading Screen */
+        #loading-screen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: white;
+            z-index: 300;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .loader {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #ff4d6d;
+            border-radius: 50%;
+            width: 50px; height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Final Roast Screen */
+        #result-screen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #0f172a; /* Sleek Slate Dark */
+            color: #38bdf8; /* Soft blue "tech" color */
+            padding: 40px 25px;
+            box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace; /* Monospace for the "Report" feel */
+            z-index: 400;
+            text-align: left;
+        }
+        .final-verdict {
+            color: white;
+            font-family: sans-serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="main-ui">
+        <h1>Valentine Eligibility Scan</h1>
+        <p>Target Status: <b>PERPETUALLY SINGLE</b></p>
+        <button id="troll-button">Scan for Potential Dates</button>
+        <p id="status-msg">Tap to begin diagnostic...</p>
+    </div>
+
+    <div id="loading-screen">
+        <div class="loader"></div>
+        <h2 id="loading-text" style="color:#333; font-weight:600;">Analyzing Delusion Levels...</h2>
+    </div>
+
+    <div id="result-screen">
+        <p style="color: #94a3b8;">> RUNNING DEEP_SCAN_2026.EXE...</p>
+        <p>> DATABASE: 8.1 BILLION PROFILES CHECKED.</p>
+        <p>> FILTER: "ANYONE WILLING TO DATE HER"</p>
+        <p style="color: #f43f5e;">> ERROR: NO MATCHES FOUND WITHIN KNOWN UNIVERSE.</p>
+        <div style="border-top: 1px solid #334155; margin: 20px 0;"></div>
+        <p style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 5px;">OFFICIAL DIAGNOSIS:</p>
+        <div class="final-verdict">SINGLE BY CHOICE*</div>
+        <p style="color: #f43f5e; font-weight: bold;">*(Not your choice, obviously)</p>
+        <br>
+        <p style="color: #94a3b8; line-height: 1.4;">Recommended: Delete Instagram. Buy a weighted blanket. Accept your fate.</p>
+        <button onclick="location.reload()" style="margin-top:30px; background:#38bdf8; border:none; color:#0f172a; padding:12px 20px; font-weight:bold; border-radius:5px;">Run Scan Again (2027)</button>
+    </div>
+
+    <script>
+        const btn = document.getElementById('troll-button');
+        const status = document.getElementById('status-msg');
+        const mainUI = document.getElementById('main-ui');
+        const loadingScreen = document.getElementById('loading-screen');
+        const loadingText = document.getElementById('loading-text');
+        const resultScreen = document.getElementById('result-screen');
+        
+        let attempts = 0;
+        const roastMessages = [
+            "Nice try!",
+            "Too slow!",
+            "A for effort, F for results.",
+            "You missed. Like he missed your hints.",
+            "Your thumb is as lonely as you.",
+            "I'm starting to feel bad now.",
+            "Even the button is rejecting you.",
+            "Okay, fine. I'll let you click it..."
+        ];
+
+        function jump() {
+            attempts++;
+            status.innerText = roastMessages[Math.min(attempts, roastMessages.length - 1)];
+            
+            // Boundary safety for mobile
+            const maxX = window.innerWidth - btn.clientWidth - 40;
+            const maxY = window.innerHeight - btn.clientHeight - 40;
+            
+            btn.style.position = 'fixed';
+            btn.style.left = Math.max(20, Math.random() * maxX) + 'px';
+            btn.style.top = Math.max(20, Math.random() * maxY) + 'px';
+
+            if (attempts > 8) {
+                btn.innerText = "CLICK ME (PITY MODE)";
+                btn.style.background = "#22c55e"; // Green for success
+                btn.style.boxShadow = "0 8px 20px rgba(34, 197, 94, 0.4)";
+                // Reset to let them actually click
+                btn.removeEventListener('touchstart', handleTouch);
+                btn.addEventListener('touchstart', startFakeLoading);
+                btn.addEventListener('click', startFakeLoading);
+            }
+        }
+
+        function handleTouch(e) {
+            e.preventDefault();
+            jump();
+            if (navigator.vibrate) navigator.vibrate(40);
+        }
+
+        btn.addEventListener('touchstart', handleTouch);
+        btn.addEventListener('mouseover', jump);
+
+        function startFakeLoading() {
+            mainUI.style.display = 'none';
+            loadingScreen.style.display = 'flex';
+            
+            // Hilarious loading sequence
+            setTimeout(() => { loadingText.innerText = "Checking the 'Blocked' list..."; }, 1500);
+            setTimeout(() => { loadingText.innerText = "Asking your ex (he said no)..."; }, 3000);
+            setTimeout(() => { loadingText.innerText = "Lowering standards to minimum..."; }, 4500);
+            setTimeout(() => { 
+                loadingScreen.style.display = 'none';
+                resultScreen.style.display = 'block';
+            }, 6000);
+        }
+    </script>
+</body>
+</html>
